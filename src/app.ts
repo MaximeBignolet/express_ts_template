@@ -1,14 +1,24 @@
-import express, {Request, Response} from "express";
-import * as dotenv from "dotenv"
+import express, { NextFunction, Request, Response } from "express";
+import router from "./routes/index.js";
 
-dotenv.config();
 const app = express();
-const port = process.env.PORT || 3000;
 
-app.get("/", (req: Request, res: Response) => {
-    res.status(200).json({message: "Hello world"})
-})
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-app.listen(port, () => {
-    console.log(`App listening on http://localhost:${port}`);
-})
+app.get("/", (_req: Request, res: Response) => {
+  res.json({ message: "Welcome to your Express + TypeScript starter" });
+});
+
+app.use(router);
+
+app.use((req: Request, res: Response) => {
+  res.status(404).json({ message: `Route ${req.originalUrl} not found` });
+});
+
+app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
+  console.error(err);
+  res.status(500).json({ message: "Internal server error" });
+});
+
+export default app;
